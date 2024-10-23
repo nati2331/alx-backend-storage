@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""A module providing tools for caching HTTP requests and tracking access.
-"""
+'''A module for caching web requests and monitoring request counts.
+'''
 import redis
 import requests
 from functools import wraps
@@ -8,17 +8,17 @@ from typing import Callable
 
 
 redis_store = redis.Redis()
-"""Redis instance available at the module level.
-"""
+'''Redis instance used at the module scope.
+'''
 
 
 def data_cacher(method: Callable) -> Callable:
-    """Decorator to cache the result of fetched data from a URL.
-    """
+    '''Decorator to store the results of data retrieval in the cache.
+    '''
     @wraps(method)
     def invoker(url) -> str:
-        """Wrapper function responsible for handling caching logic.
-        """
+        '''A wrapper function that handles the caching mechanism.
+        '''
         redis_store.incr(f'count:{url}')
         result = redis_store.get(f'result:{url}')
         if result:
@@ -32,7 +32,7 @@ def data_cacher(method: Callable) -> Callable:
 
 @data_cacher
 def get_page(url: str) -> str:
-    """Fetches the content of a URL, stores the response in cache, 
-    and tracks how often the URL is requested.
-    """
+    '''Fetches the content of the URL, stores it in the cache, 
+    and keeps track of how many times the URL is accessed.
+    '''
     return requests.get(url).text
